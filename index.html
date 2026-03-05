@@ -46,6 +46,7 @@
       top: 0;
       left: 0;
       cursor: crosshair;
+      touch-action: none;
     }
 
     .container {
@@ -199,6 +200,40 @@
         ctx.beginPath();
         ctx.arc(x, y, 25, 0, Math.PI * 2);
         ctx.fill();
+      });
+
+      const getTouch = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0] || e.changedTouches[0];
+        return {
+          x: touch.clientX - rect.left,
+          y: touch.clientY - rect.top
+        };
+      };
+
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDrawing = true;
+      }, { passive: false });
+
+      canvas.addEventListener('touchmove', (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const { x, y } = getTouch(e);
+        ctx.beginPath();
+        ctx.arc(x, y, 25, 0, Math.PI * 2);
+        ctx.fill();
+      }, { passive: false });
+
+      canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        isDrawing = false;
+        checkRevealProgress();
+      }, { passive: false });
+
+      canvas.addEventListener('touchcancel', () => {
+        isDrawing = false;
+        checkRevealProgress();
       });
     };
   </script>
